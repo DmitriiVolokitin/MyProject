@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/generalmainmenu.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="Main menu" />
+	</ui:define>
+
+	<ui:define name="header">
+
+		<p:tabMenu activeIndex="#{param.i}">
+			<p:menuitem value="Tasks" outcome="/ui/menu/tabMenu"
+				icon="ui-icon-star">
+			</p:menuitem>
+			<p:menuitem value="Reports" outcome="/ui/menu/tabMenu"
+				icon="ui-icon-search">
+				<f:param name="i" value="1" />
+			</p:menuitem>
+			<p:menuitem value="Settings" outcome="/ui/menu/tabMenu"
+				icon="ui-icon-document">
+				<f:param name="i" value="2" />
+			</p:menuitem>
+			<p:menuitem value="Support" outcome="/ui/menu/tabMenu"
+				icon="ui-icon-wrench">
+				<f:param name="i" value="3" />
+			</p:menuitem>
+		</p:tabMenu>
+	</ui:define>
+
+	<f:param name="i" value="0" />
+	<ui:define name="content">
+		<f:metadata>
+			<f:event type="postAddToView" listener="#{uiUtils.greetOnViewLoad}"
+				update="growlMessages" />
+			<f:attribute name="firstName" value="#{user.firstName}" />
+			<f:attribute name="lastName" value="#{user.lastName}" />
+		</f:metadata>
+
+		<!-- <p:messages id="messages" /> -->
+		<p:growl id="messages" />
+
+		<p:dataTable value="#{checkListController.checks1}" var="check"
+			id="checkTable">
+			<p:column headerText="name">
+		#{check.name}
+		</p:column>
+			<p:column headerText="url">
+				<a href="#{check.url}" target="_blank"> #{check.url} </a>
+			</p:column>
+			<p:column headerText="operations">
+				<h:form>
+					<p:commandButton value="edit"
+						action="#{checkListController.setCheck(check)}"
+						update=":checkForm" resetValues="true"
+						oncomplete="PF('checkDialog').show()" />
+					<p:commandButton value="remove"
+						action="#{checkListController.remove(check)}"
+						update=":checkTable, :messages">
+						<!--
+						<p:confirm header="Confirmation" message="Are you sure?"
+							icon="ui-icon-alert" />
+						-->
+					</p:commandButton>
+				</h:form>
+			</p:column>
+		</p:dataTable>
+
+		<br />
+		<h:form>
+			<p:commandButton value="add check"
+				action="#{checkListController.clear()}" update=":checkForm"
+				oncomplete="PF('checkDialog').show()" resetValues="true" />
+		</h:form>
+
+		<p:dialog widgetVar="checkDialog" closeOnEscape="true" modal="true"
+			header="check">
+			<h:form id="checkForm">
+				<p:messages />
+				<p:focus />
+				<p:panelGrid columns="2">
+		name:
+		<p:inputText value="#{checkListController.check.name}" />
+		
+		url:
+		<p:inputText value="#{checkListController.check.url}" />
+				</p:panelGrid>
+				<p:commandButton value="save" action="#{checkListController.save()}"
+					update="checkForm, :checkTable"
+					oncomplete="handleDialogSubmit(args, 'checkDialog')" />
+			</h:form>
+		</p:dialog>
+
+		<!--  
+		<h:form>
+			<p:confirmDialog global="true" closeOnEscape="true">
+				<p:commandButton value="Yes" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="No" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+		</h:form>
+		-->
+
+		<script type="text/javascript">
+    		function handleDialogSubmit(args, dialogName) {
+        		if (!args.validationFailed) {
+            		PF(dialogName).hide();
+        		}
+   			 }
+		</script>
+
+		<p:growl id="msgs" showDetail="true" />
+		<p:tabView scrollable="true">
+			<p:tab title="Status">
+				<p:dataTable id="Status" var="satus"
+					value="#{dtResizableColumnsView.Status}" resizableColumns="true"
+					style="margin-bottom:20px">
+					<p:column headerText="Id">
+						<h:outputText value="#{satus.id}" />
+					</p:column>
+					<p:column headerText="Year">
+						<h:outputText value="#{satus.year}" />
+					</p:column>
+					<p:column headerText="Brand">
+						<h:outputText value="#{satus.brand}" />
+					</p:column>
+					<p:column headerText="Color">
+						<h:outputText value="#{satus.color}" />
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+			<p:tab title="Files">
+				Tab 2 Content
+			</p:tab>
+			<p:tab title="History">
+				Tab 3 Content
+			</p:tab>
+		</p:tabView>
+	</ui:define>
+
+</ui:composition>
